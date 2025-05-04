@@ -1,162 +1,11 @@
-/* eslint-disable max-lines */
-/* eslint-disable @typescript-eslint/no-magic-numbers, @typescript-eslint/no-use-before-define, unicorn/no-null */
-import { Area, Entity, Player, Collectible, GameState } from './classes';
+/* eslint-disable @typescript-eslint/no-magic-numbers, unicorn/no-null */
+import { Entity, Player, GameState } from './classes';
+import {
+  random, getContrastColor, getCurrentArea, spawnFlyingObstacle, spawnCoin,
+  checkCollision, checkCoinCollision, drawWeather, restartGame
+} from './functions';
 
-// #region Functions
-/** Same result as random(), but secure. */
-const random = () => globalThis.crypto.getRandomValues(new Uint32Array(1))[0] / 2 ** 32;
-
-/** @type {Game['getContrastColor']} */
-function getContrastColor(hex) {
-  /* eslint-disable-next-line id-length */
-  const [r, g, b] = hex.match(/\d{2}/g).map(e => Number.parseInt(e, 16));
-  const brightness = (r * 299 + g * 587 + b * 114) / 1000;
-  return brightness > 128 ? 'black' : 'white';
-}
-
-/** @type {Game['getCurrentArea']} */
-function getCurrentArea() {
-  if (persistentScore >= 666) return blackHole;
-
-  const planetIndex = Math.min(Math.floor(persistentScore / 60), areas.length - 1);
-  return areas[planetIndex];
-}
-
-// We'll also add a 'hasHit' flag for flying obstacles when they spawn.
-/** @type {Game['spawnFlyingObstacle']} */
-function spawnFlyingObstacle(currentArea) {
-  return new Entity({
-    // color:
-    baseSpeed: 5 + level / 2,
-    width: 40,
-    height: 20,
-    posX: canvas.width,
-
-    // For Venus, spawn obstacles lower
-    posY: random() * (
-      currentArea.name === 'Venus'
-        ? (canvas.height / 5) + (canvas.height * 0.6)
-        : canvas.height / 2
-    ),
-    posZ: 0
-  });
-}
-
-/** @type {Game['spawnCoin']} */
-const spawnCoin = () => new Collectible(
-  'coin', 10,
-  random() * (canvas.width - 20) + 10,
-  random() * (canvas.height - 100) + 10
-);
-
-/** @type {Game['checkCollision']} */
-function checkCollision(rect1, rect2) {
-  const x1 = rect1.x ?? rect1.posX;
-  const y1 = rect1.y ?? rect1.posY;
-  const x2 = rect2.x ?? rect2.posX;
-  const y2 = rect2.y ?? rect2.posY;
-
-  return (
-    x1 < x2 + rect2.width
-    && y1 < y2 + rect2.height
-    && x1 + rect1.width > x2
-    && y1 + rect1.height > y2
-  );
-}
-
-/** @type {Game['checkCoinCollision']} */
-function checkCoinCollision(coin, player) {
-  const dx = coin.posX - (player.posX + player.width / 2);
-  const dy = coin.posY - (player.posY + player.height / 2);
-
-  return Math.hypot(dx, dy) < coin.radius + Math.min(player.width, player.height) / 4;
-}
-
-/** @type {Game['drawWeather']} */
-function drawWeather(currentArea) {
-  const numDrops = 30;
-
-  for (let i = 0; i < numDrops; i++) {
-    const x = random() * canvas.width;
-    const y = random() * canvas.height;
-
-    const length = random() * 15 + 5;
-    if (currentArea.name === 'Sun')
-      ctx.strokeStyle = 'rgba(255, 69, 0, 0.5)';
-    else if (['Venus', 'Earth', 'Mars'].includes(currentArea.name))
-      ctx.strokeStyle = 'rgba(173, 216, 230, 0.5)';
-    else
-      continue;
-
-    ctx.beginPath();
-    ctx.moveTo(x, y);
-    ctx.lineTo(x, y + length);
-    ctx.stroke();
-  }
-}
-
-/** @type {Game['restartGame']} */
-function restartGame() {
-  score = 0;
-  persistentScore = 0;
-  level = 1;
-  gameState = GameState.playing;
-
-  justin.reset();
-
-  collisionEffectTimer = 0;
-  flyingObstacles = [];
-  flyingObstacleTimer = 300;
-
-  // TODO: remove old coin
-  coin = spawnCoin();
-
-  powerUp = null;
-  powerUpTimer = Math.floor(random() * 700) + 800;
-
-  enemyBoostTime = 0;
-  console.debug('Game restarted');
-}
-
-// #endregion Functions
-
-/** @type {HTMLCanvasElement} */
-globalThis.canvas = document.querySelector('#gameCanvas');
-
-/** @type {CanvasRenderingContext2D} */
-globalThis.ctx = canvas.getContext('2d');
-
-/* Game settings
-   const immortal = false; */
-/* eslint-disable-next-line prefer-const */
-let testingMode = false;
-
-/**
- * @type {Game.Area[]}
- * Array of areas (from easiest to hardest) */
-const areas = [
-  new Area('Mercury', '#666666', 0.4, new Entity({ color: 'gray', baseSpeed: 3, height: 20 })),
-  new Area('Venus', '#FFB347', 0.45, new Entity({ color: 'orange', baseSpeed: 3.2, height: 35 })),
-  new Area('Earth', '#4B9CD3', 0.5, new Entity({ color: 'brown', baseSpeed: 3, height: 45 })),
-  new Area('Mars', '#CC3300', 0.55, new Entity({ color: 'white', baseSpeed: 3.5, height: 40 })),
-  new Area('Jupiter', '#D2B48C', 0.6, new Entity({ color: 'beige', baseSpeed: 4, height: 50 })),
-  new Area('Saturn', '#F0E68C', 0.65, new Entity({ color: 'goldenrod', baseSpeed: 3.8, height: 45 })),
-  new Area('Uranus', '#AFEEEE', 0.7, new Entity({ color: 'lightblue', baseSpeed: 4.2, height: 40 })),
-  new Area('Neptune', '#4169E1', 0.75, new Entity({ color: 'blue', baseSpeed: 4.5, height: 40 })),
-  new Area('Sun', '#FF4500', 0.8, new Entity({ color: 'black', baseSpeed: 5, height: 50 }))
-];
-
-/**
- * @type {Area}
- * Endlevel: Black Hole when persistentScore >= 666 */
-const blackHole = new Area('Black Hole', '#000000', 1.2, new Entity('#222222', 10, 60));
-
-// Global variables
-let score = 0;
-let persistentScore = 0;
-let level = 1;
-let gameState = GameState.playing;
-let collisionEffectTimer = 0;
+const collisionEffectTimer = 0;
 
 let coin = spawnCoin();
 
@@ -166,7 +15,7 @@ let powerUpTimer = Math.floor(random() * 700) + 800; // 800 to 1500 frames
 let enemyBoostTime = 0;
 
 // Array for flying obstacles
-let flyingObstacles = [];
+const flyingObstacles = [];
 let flyingObstacleTimer = 300;
 
 /** @type {Game.Player} */

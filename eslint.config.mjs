@@ -12,7 +12,15 @@ export default [
         ...globals.browser,
         Game: 'readonly',
         canvas: 'writeable',
-        ctx: 'writeable'
+        ctx: 'writeable',
+        testingMode: 'writeable',
+        areas: 'readonly',
+        blackHole: 'readonly', // TODO: remove after refactor
+        score: 'writeable',
+        persistentScore: 'writeable',
+        level: 'writeable',
+        gameState: 'writeable',
+
       }
     }
   }
