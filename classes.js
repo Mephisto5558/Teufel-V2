@@ -2,6 +2,11 @@
 export class Area {
   name; background; gravity; enemy;
 
+  /**
+   * @param {import('./types/classes').AreaOptions[0]}name
+   * @param {import('./types/classes').AreaOptions[1]}background
+   * @param {import('./types/classes').AreaOptions[2]}gravity
+   * @param {import('./types/classes').AreaOptions[3]}enemy*/
   constructor(name, background, gravity, enemy) {
     this.name = name;
     this.background = background;
@@ -14,6 +19,7 @@ export class Entity {
   color; baseSpeed; width; height; speed; posX; posY; posZ;
   hasHit;
 
+  /** @param {import('./types/classes').EntityOptions} options */
   constructor({
     color, baseSpeed, width, height,
     posX, posY, posZ
@@ -51,6 +57,7 @@ export class Player extends Entity {
   jumpStrength; gravity; maxHealth; health;
   immortalityTime; damageReduction; invulTimer; dashTime; dashCooldown;
 
+  /** @param {import('./types/classes').EntityOptions & import('./types/classes').PlayerOptions} options */
   constructor({ jumpStrength, gravity, maxHealth, ...entityArgs }) {
     super(entityArgs);
 
@@ -90,6 +97,7 @@ export class Player extends Entity {
 export class Collectible {
   posX; posY;
 
+  /** @param {import('./types/classes').CollectibleOptions}options */
   constructor({ posX, posY }) {
     this.posX = posX;
     this.posY = posY;
@@ -99,6 +107,7 @@ export class Collectible {
 export class Coin extends Collectible {
   radius;
 
+  /** @param {{radius: import('./types/classes').Coin['radius']} & import('./types/classes').CollectibleOptions}options */
   constructor({ radius, ...collectibleArgs }) {
     super(collectibleArgs);
 
@@ -110,6 +119,7 @@ export class Coin extends Collectible {
 export class PowerUp extends Collectible {
   width; height; duration; timer;
 
+  /** @param {{width: number, height: number, duration: number, timer: number} & import('./types/classes').CollectibleOptions}options */
   constructor({ width, height, duration, timer, ...collectibleArgs }) {
     super(...collectibleArgs);
 
@@ -120,6 +130,7 @@ export class PowerUp extends Collectible {
   }
 }
 
+/** @type {import('./types/classes').GameState} */
 export const GameState = Object.freeze(Object.fromEntries(
   ['playing', 'shop', 'gameOver'].map(e => [e, Symbol(e)])
 ));

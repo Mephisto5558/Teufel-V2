@@ -5,7 +5,7 @@ import { Entity, GameState, Coin, PowerUp } from './classes';
 /** Same result as random(), but secure. */
 export const random = () => globalThis.crypto.getRandomValues(new Uint32Array(1))[0] / 2 ** 32;
 
-/** @type {Game['getContrastColor']} */
+/** @type {import('./types/functions').getContrastColor} */
 export function getContrastColor(hex) {
   /* eslint-disable-next-line id-length */
   const [r, g, b] = hex.match(/\d{2}/g).map(e => Number.parseInt(e, 16));
@@ -13,7 +13,7 @@ export function getContrastColor(hex) {
   return brightness > 128 ? 'black' : 'white';
 }
 
-/** @type {Game['getCurrentArea']} */
+/** @type {import('./types/functions').getCurrentArea} */
 export function getCurrentArea() {
   if (persistentScore >= 666) return blackHole;
 
@@ -22,7 +22,7 @@ export function getCurrentArea() {
 }
 
 // We'll also add a 'hasHit' flag for flying obstacles when they spawn.
-/** @type {Game['spawnFlyingObstacle']} */
+/** @type {import('./types/functions').spawnFlyingObstacle} */
 export function spawnFlyingObstacle(currentArea) {
   return new Entity({
     // color:
@@ -41,13 +41,14 @@ export function spawnFlyingObstacle(currentArea) {
   });
 }
 
-/** @type {Game['spawnCoin']} */
+/** @type {import('./types/functions').spawnCoin} */
 export const spawnCoin = () => new Coin({
   posX: random() * (canvas.width - 20) + 10,
   posY: random() * (canvas.height - 100) + 10,
   radius: 10
 });
 
+/** @type {import('./types/functions').spawnPowerUp} */
 export const spawnPowerUp = () => new PowerUp({
   posX: random() * (canvas.width - 30) + 15,
   posY: random() * (canvas.height / 3) + (canvas.height * 2 / 3 - 50),
@@ -55,7 +56,7 @@ export const spawnPowerUp = () => new PowerUp({
   timer: Math.floor(random() * 700) + 800 // 800 to 1500 frames
 });
 
-/** @type {Game['checkCollision']} */
+/** @type {import('./types/functions').checkCollision} */
 export function checkCollision(rect1, rect2) {
   const x1 = rect1.x ?? rect1.posX;
   const y1 = rect1.y ?? rect1.posY;
@@ -70,7 +71,7 @@ export function checkCollision(rect1, rect2) {
   );
 }
 
-/** @type {Game['checkCoinCollision']} */
+/** @type {import('./types/functions').checkCoinCollision} */
 export function checkCoinCollision(coin, player) {
   const dx = coin.posX - (player.posX + player.width / 2);
   const dy = coin.posY - (player.posY + player.height / 2);
@@ -78,7 +79,7 @@ export function checkCoinCollision(coin, player) {
   return Math.hypot(dx, dy) < coin.radius + Math.min(player.width, player.height) / 4;
 }
 
-/** @type {Game['drawWeather']} */
+/** @type {import('./types/functions').drawWeather} */
 export function drawWeather(currentArea) {
   const numDrops = 30;
 
@@ -101,7 +102,7 @@ export function drawWeather(currentArea) {
   }
 }
 
-/** @type {Game['restartGame']} */
+/** @type {import('./types/functions').restartGame} */
 export function restartGame() {
   score = 0;
   persistentScore = 0;
