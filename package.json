@@ -18,8 +18,8 @@
   },
   "homepage": "https://github.com/Burekdiller/Justin-Teufel-V2#readme",
   "devDependencies": {
-    "@mephisto5558/eslint-config": "file:../libs/eslint-config",
+    "@mephisto5558/eslint-config": "latest",
     "eslint": "9.23",
-    "globals": "^16.0.0"
+    "globals": "^16.2.0"
   }
 }
