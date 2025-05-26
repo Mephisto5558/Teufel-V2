@@ -52,8 +52,8 @@ export const spawnCoin = () => new Coin({
 export const spawnPowerUp = () => new PowerUp({
   posX: random() * (canvas.width - 30) + 15,
   posY: random() * (canvas.height / 3) + (canvas.height * 2 / 3 - 50),
-  width: 20, height: 20, duration: 600,
-  timer: Math.floor(random() * 700) + 800 // 800 to 1500 frames
+  width: 20, height: 20, duration: 10000,
+  timer: Math.floor(random() * 6667) + 13333 // 13000ms - 20000ms
 });
 
 /** @type {import('./types/functions').checkCollision} */
@@ -103,24 +103,22 @@ export function drawWeather(currentArea) {
 }
 
 /** @type {import('./types/functions').restartGame} */
-export function restartGame() {
+export function restartGame(justin) {
   score = 0;
   persistentScore = 0;
   level = 1;
   gameState = GameState.playing;
 
   justin.reset();
+  for (const area of areas) area.enemy.reset();
 
-  collisionEffectTimer = 0;
   flyingObstacles = [];
   flyingObstacleTimer = 300;
-
-  // TODO: remove old coin
-  coin = spawnCoin();
-
-  powerUp = null;
-  powerUpTimer = Math.floor(random() * 700) + 800;
-
+  collisionEffectTimer = 0;
   enemyBoostTime = 0;
+  
+  coin = spawnCoin();
+  powerUp = spawnPowerUp();
+
   console.debug('Game restarted');
 }

@@ -2,7 +2,7 @@
 
 import './globals.js'
 
-import { Entity, Player, GameState } from './classes.js';
+import { Player, GameState } from './classes.js';
 import {
   random, getContrastColor, getCurrentArea,
   spawnFlyingObstacle, spawnCoin, spawnPowerUp,
@@ -39,7 +39,7 @@ const shopCosts = [15, 20, 25, 25, 100];
 document.addEventListener('keydown', e => {
   switch (gameState) {
     case GameState.gameOver:
-      if (e.key.toLowerCase() === 'r') restartGame();
+      if (e.key.toLowerCase() === 'r') restartGame(justin);
       break;
 
 
@@ -217,6 +217,7 @@ function update(deltaTime) {
     if (checkCollision(powerUp, justin)) {
       justin.immortalityTime = 5000;
       enemyBoostTime = 4700;
+
       console.debug('Power-Up collected!');
     }
   }
